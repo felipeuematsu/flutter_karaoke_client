@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 
 import 'package:archive/archive_io.dart';
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,8 @@ import 'package:just_audio/just_audio.dart';
 
 class KaraokeService extends GetxController {
   bool get isPlaying => _audioPlayer.playing;
+
+  late final isolate = Isolate.spawn((_) => _loopVideoRender(), null);
 
   bool isClosed = false;
   bool isLoaded = false;
@@ -49,11 +52,11 @@ class KaraokeService extends GetxController {
     _audioPlayer.play();
   }
 
-  dynamic _loopVideoRender() async {
+  void _loopVideoRender() async {
     while (true) {
+      await Future.delayed(const Duration(milliseconds: 10));
       if (isClosed) return;
       if (isPlaying) {
-        await Future.delayed(const Duration(milliseconds: 10));
         final CdgRender render = _cdgPlayer.render(_audioPlayer.position.inMilliseconds);
         if (render.isChanged) {
           audioDurationStream.sink.add(render);
@@ -66,7 +69,7 @@ class KaraokeService extends GetxController {
   void onInit() {
     super.onInit();
     loadZip('assets/cdg/test.zip').then((_) => isLoaded = true);
-    compute(_loopVideoRender(), null);
+    _loopVideoRender();
   }
 
   @override
