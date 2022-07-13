@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:archive/archive_io.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_player.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_render.dart';
@@ -10,12 +11,11 @@ import 'package:just_audio/just_audio.dart';
 class KaraokeService extends GetxController {
   bool get isPlaying => _audioPlayer.playing;
 
+  bool isClosed = false;
   bool isLoaded = false;
 
   final CDGPlayer _cdgPlayer = CDGPlayer();
-  final AudioPlayer _audioPlayer = AudioPlayer()..createPositionStream(minPeriod: const Duration(milliseconds: 1));
-
-  // final AudioPlayer _audioPlayer = AudioPlayer()..createPositionStream(minPeriod: const Duration(milliseconds: 1));
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   final audioDurationStream = StreamController<CdgRender>.broadcast();
   final audioStateStream = StreamController<CdgRender>.broadcast();
@@ -47,11 +47,17 @@ class KaraokeService extends GetxController {
   Future<void> _play() async {
     if (!isLoaded) return;
     _audioPlayer.play();
-    while (isPlaying) {
-      await Future.delayed(const Duration(milliseconds: 10));
-      final CdgRender render = _cdgPlayer.render(_audioPlayer.position.inMilliseconds);
-      if (render.isChanged) {
-        audioDurationStream.sink.add(render);
+  }
+
+  dynamic _loopVideoRender() async {
+    while (true) {
+      if (isClosed) return;
+      if (isPlaying) {
+        await Future.delayed(const Duration(milliseconds: 10));
+        final CdgRender render = _cdgPlayer.render(_audioPlayer.position.inMilliseconds);
+        if (render.isChanged) {
+          audioDurationStream.sink.add(render);
+        }
       }
     }
   }
@@ -60,12 +66,14 @@ class KaraokeService extends GetxController {
   void onInit() {
     super.onInit();
     loadZip('assets/cdg/test.zip').then((_) => isLoaded = true);
+    compute(_loopVideoRender(), null);
   }
 
   @override
   void onClose() {
     _audioPlayer.stop();
     audioDurationStream.close();
+    isClosed = false;
     super.onClose();
   }
 
