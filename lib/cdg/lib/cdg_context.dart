@@ -25,7 +25,7 @@ class CDGContext {
   List<List<int>> clut = List<List<int>>.generate(16, (_) => [0, 0, 0], growable: false); // color lookup table
   Uint8List pixels = Uint8List(kWidth * kHeight);
   Uint8List buffer = Uint8List(kWidth * kHeight);
-  CDGImageData imageData = CDGImageData(kWidth, kHeight);
+  CdgImageData imageData = CdgImageData(kWidth, kHeight);
 
   List<int> backgroundRGBA = List.of([0, 0, 0, 0], growable: false);
   List<int> contentBounds = List.of([0, 0, 0, 0], growable: false);

@@ -1,27 +1,64 @@
 import 'dart:async';
-import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:archive/archive_io.dart';
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_player.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_render.dart';
-import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
-class KaraokeService extends GetxController {
-  bool get isPlaying => _audioPlayer.playing;
+Map<String, dynamic> _encodeRender(CdgRender render) {
+  return {
+    'width': render.imageData.width,
+    'height': render.imageData.height,
+    'data': render.imageData.data,
+  };
+}
 
-  late final isolate = Isolate.spawn((_) => _loopVideoRender(), null);
+class KaraokePlayerController {
+  KaraokePlayerController._() {
+    isOpen = true;
+    loadZip('assets/cdg/test.zip').then((_) => isLoaded = true);
+    timer;
+  }
 
-  bool isClosed = false;
+  factory KaraokePlayerController() => _instance;
+  static final KaraokePlayerController _instance = KaraokePlayerController._();
+
+  late final timer = Timer.periodic(const Duration(milliseconds: 16), (_) {
+    try {
+      final CdgRender render = _cdgPlayer.render(_audioPlayer.position.inMilliseconds);
+      if (render.isChanged) {
+        renderStream.sink.add(render);
+        try {
+          final playerId = playerWindowId;
+          if (playerId != null) {
+            final encodedRender = _encodeRender(render);
+            DesktopMultiWindow.invokeMethod(playerId, 'render', encodedRender);
+            // compute(_encodeRender, render).then((value) => DesktopMultiWindow.invokeMethod(id, 'render', value));
+          }
+        } catch (_) {}
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+  });
+
+  Stream<bool> get isPlayingStream => _audioPlayer.playingStream;
+
+  bool isOpen = false;
   bool isLoaded = false;
+
+  int? playerWindowId;
 
   final CDGPlayer _cdgPlayer = CDGPlayer();
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  final audioDurationStream = StreamController<CdgRender>.broadcast();
-  final audioStateStream = StreamController<CdgRender>.broadcast();
+  final renderStream = StreamController<CdgRender>.broadcast();
 
   Future<void> loadZip(String zipPath) async {
     await rootBundle.load(zipPath).then((ByteData data) async {
@@ -40,7 +77,7 @@ class KaraokeService extends GetxController {
   }
 
   Future<void> playOnPressed() async {
-    if (isPlaying) {
+    if (_audioPlayer.playing) {
       _audioPlayer.pause();
     } else {
       _play();
@@ -52,32 +89,9 @@ class KaraokeService extends GetxController {
     _audioPlayer.play();
   }
 
-  void _loopVideoRender() async {
-    while (true) {
-      await Future.delayed(const Duration(milliseconds: 10));
-      if (isClosed) return;
-      if (isPlaying) {
-        final CdgRender render = _cdgPlayer.render(_audioPlayer.position.inMilliseconds);
-        if (render.isChanged) {
-          audioDurationStream.sink.add(render);
-        }
-      }
-    }
-  }
-
-  @override
-  void onInit() {
-    super.onInit();
-    loadZip('assets/cdg/test.zip').then((_) => isLoaded = true);
-    _loopVideoRender();
-  }
-
-  @override
-  void onClose() {
+  void close() {
     _audioPlayer.stop();
-    audioDurationStream.close();
-    isClosed = false;
-    super.onClose();
+    renderStream.close();
   }
 
   void stop() {
