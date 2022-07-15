@@ -41,7 +41,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return FluentApp(
       title: 'Flutter Demo',
+      themeMode: ThemeMode.system,
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+      ),
       theme: ThemeData(
+        // acrylicBackgroundColor: ,
         focusTheme: const FocusThemeData(glowFactor: 4.0),
       ),
       home: const HomeView(),

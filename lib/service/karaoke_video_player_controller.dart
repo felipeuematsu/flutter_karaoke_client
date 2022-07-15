@@ -9,4 +9,10 @@ abstract class KaraokeVideoPlayerController {
   Future<void> stop();
 
   Future<void> play();
+
+  Future<void> pause();
+
+  Future<void> addToQueue(int songId, int singerId);
+
+  Future<void> skip();
 }
