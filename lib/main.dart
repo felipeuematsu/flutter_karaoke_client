@@ -4,7 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_cdg_karaoke_player/features/home/home_view.dart';
 import 'package:flutter_cdg_karaoke_player/service/karaoke_main_player_controller.dart';
 import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/karaoke_player_window.dart';
-import 'package:flutter_cdg_karaoke_player/service/karaoke_main_player_controller_impl.dart';
+import 'package:flutter_cdg_karaoke_player/service/impl/karaoke_main_player_controller_impl.dart';
 import 'package:flutter_cdg_karaoke_player/service/karaoke_video_player_controller.dart';
 import 'package:flutter_cdg_karaoke_player/service/impl/karaoke_video_player_controller_impl.dart';
 import 'package:get_it/get_it.dart';
