@@ -17,16 +17,6 @@ class CdgImage extends StatefulWidget {
 
 class _CdgImageState extends State<CdgImage> {
   Uint8List? bytes(CdgImageData imageData) => imageData.data.buffer.asUint8List();
-
-  Color backgroundColor(List<int> backgroundRgba) {
-    return Color.fromARGB(
-      backgroundRgba[3],
-      backgroundRgba[0],
-      backgroundRgba[1],
-      backgroundRgba[2],
-    );
-  }
-
   Image? lastImage;
 
   @override

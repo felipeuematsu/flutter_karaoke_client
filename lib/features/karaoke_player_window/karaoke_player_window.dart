@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:bitmap/bitmap.dart';
@@ -6,19 +7,20 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/cdg_painter.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_context.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_render.dart';
-import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/karaoke_video_player_controller.dart';
+import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/karaoke_player_controller.dart';
+import 'package:window_manager/window_manager.dart';
 
 class KaraokePlayerWindow extends StatefulWidget {
-  const KaraokePlayerWindow({Key? key, required this.windowController}) : super(key: key);
+  const KaraokePlayerWindow({Key? key, this.windowController}) : super(key: key);
 
-  final WindowController windowController;
+  final WindowController? windowController;
 
   @override
   State<KaraokePlayerWindow> createState() => _KaraokePlayerWindowState();
 }
 
 class _KaraokePlayerWindowState extends State<KaraokePlayerWindow> {
-  late final _videoPlayerService = KaraokeVideoPlayerController(widget.windowController.windowId);
+  late final _videoPlayerService = KaraokePlayerController();
 
   CustomPaint? lastPaint;
 
@@ -30,36 +32,50 @@ class _KaraokePlayerWindowState extends State<KaraokePlayerWindow> {
         focusTheme: const FocusThemeData(glowFactor: 4.0),
       ),
       home: GestureDetector(
-        onDoubleTap: () {},
+        onDoubleTap: () async {
+          windowManager.setFullScreen(!(await windowManager.isFullScreen()));
+        },
         child: Acrylic(
           child: Center(
-            child: Transform(
-              transform: Matrix4.identity()
-              // ..scale(minScale, minScale)
-              ,
-              child: StreamBuilder<CdgRender>(
-                stream: _videoPlayerService.renderStream.stream,
-                builder: (_, snapshot) {
-                  final data = snapshot.data;
-                  if (data == null) return const SizedBox();
-                  return FutureBuilder<ui.Image>(
-                    future: Bitmap.fromHeadful(data.imageData.width, data.imageData.height, data.imageData.data).buildImage(),
-                    builder: (context, snapshot) {
-                      final imageData = snapshot.data;
-                      if (snapshot.connectionState == ConnectionState.done && imageData != null) {
-                        return lastPaint = CustomPaint(
-                          painter: CdgPainter(imageData: imageData),
-                          size: const Size(CDGContext.kWidthDouble, CDGContext.kHeightDouble),
-                          isComplex: true,
-                          willChange: data.isChanged,
+            child: FutureBuilder<Size>(
+                future: windowManager.getSize(),
+                builder: (context, snapshot) {
+                  final size = snapshot.data;
+
+                  if (size == null) {
+                    return const SizedBox();
+                  }
+                  final heightScale = CDGContext.kHeightDouble / size.height;
+                  final widthScale = CDGContext.kWidthDouble / size.width;
+                  final minScale = min(heightScale, widthScale);
+                  return Transform(
+                    transform: Matrix4.identity()
+                    ..scale(minScale, minScale)
+                    ,
+                    child: StreamBuilder<CdgRender>(
+                      stream: _videoPlayerService.renderStream.stream,
+                      builder: (_, snapshot) {
+                        final data = snapshot.data;
+                        if (data == null) return const SizedBox();
+                        return FutureBuilder<ui.Image>(
+                          future: Bitmap.fromHeadful(data.imageData.width, data.imageData.height, data.imageData.data).buildImage(),
+                          builder: (context, snapshot) {
+                            final imageData = snapshot.data;
+                            if (snapshot.connectionState == ConnectionState.done && imageData != null) {
+                              return lastPaint = CustomPaint(
+                                painter: CdgPainter(imageData: imageData),
+                                size: const Size(CDGContext.kWidthDouble, CDGContext.kHeightDouble),
+                                isComplex: true,
+                                willChange: data.isChanged,
+                              );
+                            }
+                            return lastPaint ?? const SizedBox();
+                          },
                         );
-                      }
-                      return lastPaint ?? const SizedBox();
-                    },
+                      },
+                    ),
                   );
-                },
-              ),
-            ),
+                }),
           ),
         ),
       ),

@@ -5,19 +5,19 @@ import 'package:fluent_ui/fluent_ui.dart' hide Image;
 import 'package:flutter_cdg_karaoke_player/cdg/cdg_painter.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_context.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_render.dart';
-import 'package:flutter_cdg_karaoke_player/service/karaoke_player_controller.dart';
+import 'package:flutter_cdg_karaoke_player/service/karaoke_video_player_controller.dart';
 
 class KaraokeMiniPlayerView extends StatefulWidget {
   const KaraokeMiniPlayerView({Key? key, required this.karaokeService}) : super(key: key);
 
-  final KaraokePlayerController karaokeService;
+  final KaraokeVideoPlayerController karaokeService;
 
   @override
   State<KaraokeMiniPlayerView> createState() => _KaraokeMiniPlayerViewState();
 }
 
 class _KaraokeMiniPlayerViewState extends State<KaraokeMiniPlayerView> {
-  final karaokeService = KaraokePlayerController();
+  final karaokeService = KaraokeVideoPlayerController();
   CustomPaint? lastPaint;
 
   @override

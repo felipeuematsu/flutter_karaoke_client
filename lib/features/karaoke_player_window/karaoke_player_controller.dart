@@ -19,6 +19,17 @@ Map<String, dynamic> _encodeRender(CdgRender render) {
 
 class KaraokePlayerController {
   KaraokePlayerController._() {
+    DesktopMultiWindow.setMethodHandler((call, fromWindowId) async {
+      switch (call.method) {
+        case 'play':
+          playOnPressed();
+          return Future.value(_audioPlayer.playing);
+        case 'stop':
+          _stop();
+          return Future.value('Ok');
+
+      }
+    });
     isOpen = true;
     loadZip('assets/cdg/test.zip').then((_) => isLoaded = true);
     timer;
@@ -94,7 +105,7 @@ class KaraokePlayerController {
     renderStream.close();
   }
 
-  void stop() {
+  void _stop() {
     _audioPlayer.stop();
   }
 }
