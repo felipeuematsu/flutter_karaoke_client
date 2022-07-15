@@ -14,7 +14,6 @@ void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   if (args.firstOrNull == 'multi_window') {
     GetIt.I.registerSingleton<KaraokeVideoPlayerController>(KaraokeVideoPlayerControllerImpl());
-    // final windowId = int.parse(args[1]);
     runApp(const MyApp());
   } else {
     final window = await DesktopMultiWindow.createWindow('');
