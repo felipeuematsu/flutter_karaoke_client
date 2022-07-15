@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_player.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_render.dart';
+import 'package:flutter_cdg_karaoke_player/service/karaoke_main_player_controller.dart';
 import 'package:just_audio/just_audio.dart';
 
 Map<String, dynamic> _encodeRender(CdgRender render) {
@@ -17,51 +18,50 @@ Map<String, dynamic> _encodeRender(CdgRender render) {
   };
 }
 
-class KaraokePlayerController {
-  KaraokePlayerController._() {
-    DesktopMultiWindow.setMethodHandler((call, fromWindowId) async {
-      switch (call.method) {
-        case 'play':
-          playOnPressed();
-          return Future.value(_audioPlayer.playing);
-        case 'stop':
-          _stop();
-          return Future.value('Ok');
+class KaraokeMainPlayerControllerImpl extends KaraokeMainPlayerController {
+  KaraokeMainPlayerControllerImpl() {
 
-      }
-    });
-    isOpen = true;
+    DesktopMultiWindow.setMethodHandler(_handler);
     loadZip('assets/cdg/test.zip').then((_) => isLoaded = true);
     timer;
   }
+  Future<dynamic> Function(MethodCall call, int fromWindowId)? get _handler => (call, fromWindowId) async {
+    switch (call.method) {
+      case 'play':
+        playOnPressed();
+        return Future.value(_audioPlayer.playing);
+      case 'stop':
+        stop();
+        return Future.value('Ok');
+    }
+  };
 
-  factory KaraokePlayerController() => _instance;
-  static final KaraokePlayerController _instance = KaraokePlayerController._();
-
+  @override
   late final timer = Timer.periodic(const Duration(milliseconds: 33), (_) {
-    try {
-      final CdgRender render = _cdgPlayer.render(_audioPlayer.position.inMilliseconds);
-      if (render.isChanged) {
-        renderStream.sink.add(render);
-        try {
-          final playerId = playerWindowId;
-          if (playerId != null) {
-            final encodedRender = _encodeRender(render);
-            DesktopMultiWindow.invokeMethod(playerId, 'render', encodedRender);
-            // compute(_encodeRender, render).then((value) => DesktopMultiWindow.invokeMethod(id, 'render', value));
-          }
-        } catch (_) {}
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
+    if (isLoaded) {
+      try {
+        final CdgRender render = _cdgPlayer.render(_audioPlayer.position.inMilliseconds);
+        if (render.isChanged) {
+          renderStream.sink.add(render);
+          try {
+            final playerId = playerWindowId;
+            if (playerId != null) {
+              final encodedRender = _encodeRender(render);
+              DesktopMultiWindow.invokeMethod(playerId, 'render', encodedRender);
+            }
+          } catch (_) {}
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print(e);
+        }
       }
     }
   });
 
+  @override
   Stream<bool> get isPlayingStream => _audioPlayer.playingStream;
 
-  bool isOpen = false;
   bool isLoaded = false;
 
   int? playerWindowId;
@@ -69,8 +69,7 @@ class KaraokePlayerController {
   final CDGPlayer _cdgPlayer = CDGPlayer();
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  final renderStream = StreamController<CdgRender>.broadcast();
-
+  @override
   Future<void> loadZip(String zipPath) async {
     await rootBundle.load(zipPath).then((ByteData data) async {
       Archive archive = ZipDecoder().decodeBytes(data.buffer.asUint8List());
@@ -87,6 +86,7 @@ class KaraokePlayerController {
     });
   }
 
+  @override
   Future<void> playOnPressed() async {
     if (_audioPlayer.playing) {
       _audioPlayer.pause();
@@ -100,12 +100,14 @@ class KaraokePlayerController {
     _audioPlayer.play();
   }
 
+  @override
   void close() {
     _audioPlayer.stop();
     renderStream.close();
   }
 
-  void _stop() {
+  @override
+  void stop() {
     _audioPlayer.stop();
   }
 }

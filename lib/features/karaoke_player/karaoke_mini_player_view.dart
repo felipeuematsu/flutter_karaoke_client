@@ -6,6 +6,7 @@ import 'package:flutter_cdg_karaoke_player/cdg/cdg_painter.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_context.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_render.dart';
 import 'package:flutter_cdg_karaoke_player/service/karaoke_video_player_controller.dart';
+import 'package:get_it/get_it.dart';
 
 class KaraokeMiniPlayerView extends StatefulWidget {
   const KaraokeMiniPlayerView({Key? key, required this.karaokeService}) : super(key: key);
@@ -17,7 +18,6 @@ class KaraokeMiniPlayerView extends StatefulWidget {
 }
 
 class _KaraokeMiniPlayerViewState extends State<KaraokeMiniPlayerView> {
-  final karaokeService = KaraokeVideoPlayerController();
   CustomPaint? lastPaint;
 
   @override
@@ -27,7 +27,7 @@ class _KaraokeMiniPlayerViewState extends State<KaraokeMiniPlayerView> {
       width: CDGContext.kWidthDouble,
       color: const Color(0xFFEEEEEE),
       child: StreamBuilder<CdgRender>(
-        stream: karaokeService.renderStream.stream,
+        stream: widget.karaokeService.renderStream.stream,
         builder: (_, snapshot) {
           final data = snapshot.data;
           if (data == null) return const ProgressRing();
