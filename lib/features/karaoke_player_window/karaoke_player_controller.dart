@@ -38,7 +38,7 @@ class KaraokePlayerController {
   factory KaraokePlayerController() => _instance;
   static final KaraokePlayerController _instance = KaraokePlayerController._();
 
-  late final timer = Timer.periodic(const Duration(milliseconds: 16), (_) {
+  late final timer = Timer.periodic(const Duration(milliseconds: 33), (_) {
     try {
       final CdgRender render = _cdgPlayer.render(_audioPlayer.position.inMilliseconds);
       if (render.isChanged) {
