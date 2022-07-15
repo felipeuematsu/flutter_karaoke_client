@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:bitmap/bitmap.dart';
@@ -6,6 +7,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/cdg_painter.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_context.dart';
 import 'package:flutter_cdg_karaoke_player/cdg/lib/cdg_render.dart';
+import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/components/window_scaffold.dart';
 import 'package:flutter_cdg_karaoke_player/service/karaoke_main_player_controller.dart';
 
 class KaraokePlayerWindow extends StatefulWidget {
@@ -19,17 +21,19 @@ class KaraokePlayerWindow extends StatefulWidget {
 }
 
 class _KaraokePlayerWindowState extends State<KaraokePlayerWindow> {
-
   CustomPaint? lastPaint;
 
   @override
   Widget build(BuildContext context) {
-    return FluentApp(
-      title: 'Karaoke Player',
-      theme: ThemeData(
-        focusTheme: const FocusThemeData(glowFactor: 4.0),
-      ),
-      home: Acrylic(
+    final height = MediaQuery.of(context).size.height / CDGContext.kHeightDouble;
+    final width = MediaQuery.of(context).size.width / CDGContext.kWidthDouble;
+
+    final minScale = min(height, width);
+    return WindowScaffold(
+      background: const DecoratedBox(decoration: BoxDecoration(color: Colors.white)),
+      body: Transform(
+        alignment: Alignment.center,
+        transform: Matrix4.identity()..scale(minScale, minScale, 1.0),
         child: Center(
           child: StreamBuilder<CdgRender>(
             stream: widget.videoPlayerService.renderStream.stream,

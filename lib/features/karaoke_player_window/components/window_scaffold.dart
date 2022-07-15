@@ -49,14 +49,6 @@ class _CustomMoveWindow extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onPanStart: (details) => appWindow.startDragging(),
-      child: Row(
-        children: const [
-          Padding(
-            padding: EdgeInsets.only(left: 4, top: 2),
-            child: Icon(FluentIcons.microphone),
-          ),
-        ],
-      ),
     );
   }
 }

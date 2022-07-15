@@ -2,6 +2,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_cdg_karaoke_player/features/home/home_view.dart';
+import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/karaoke_player_window_app.dart';
 import 'package:flutter_cdg_karaoke_player/service/karaoke_main_player_controller.dart';
 import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/karaoke_player_window.dart';
 import 'package:flutter_cdg_karaoke_player/service/impl/karaoke_main_player_controller_impl.dart';
@@ -18,7 +19,7 @@ void main(List<String> args) async {
   } else {
     final window = await DesktopMultiWindow.createWindow('');
     GetIt.I.registerSingleton<KaraokeMainPlayerController>(KaraokeMainPlayerControllerImpl()..playerWindowId = window.windowId);
-    runApp(KaraokePlayerWindow(videoPlayerService: GetIt.I.get()));
+    runApp(const KaraokePlayerWindowApp());
     doWhenWindowReady(() async {
       appWindow.alignment = Alignment.topLeft;
       appWindow.title = 'Karaoke';
