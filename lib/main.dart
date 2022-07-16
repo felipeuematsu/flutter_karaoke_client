@@ -1,6 +1,7 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_cdg_karaoke_player/config/theme.dart';
 import 'package:flutter_cdg_karaoke_player/features/home/home_view.dart';
 import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/karaoke_player_window_app.dart';
 import 'package:flutter_cdg_karaoke_player/service/karaoke_main_player_controller.dart';
@@ -15,7 +16,7 @@ void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   if (args.firstOrNull == 'multi_window') {
     GetIt.I.registerSingleton<KaraokeVideoPlayerController>(KaraokeVideoPlayerControllerImpl());
-    runApp(const MyApp());
+    runApp(const MainApp());
   } else {
     final window = await DesktopMultiWindow.createWindow('');
     GetIt.I.registerSingleton<KaraokeMainPlayerController>(KaraokeMainPlayerControllerImpl()..playerWindowId = window.windowId);
@@ -34,8 +35,8 @@ void main(List<String> args) async {
   }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +46,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      theme: ThemeData(
-        // acrylicBackgroundColor: ,
-        focusTheme: const FocusThemeData(glowFactor: 4.0),
-      ),
+      theme: lightTheme,
       home: const HomeView(),
     );
   }

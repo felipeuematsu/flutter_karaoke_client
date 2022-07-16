@@ -1,4 +1,4 @@
-# untitled
+# flutter_karaoke_player
 
 Flutter CDG Karaoke Player
 

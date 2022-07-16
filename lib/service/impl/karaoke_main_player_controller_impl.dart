@@ -30,6 +30,13 @@ class KaraokeMainPlayerControllerImpl extends KaraokeMainPlayerController {
     _audioPlayer.playingStream.listen(_playingCallback);
   }
 
+  Future<void> _invokeMethod(String method, [dynamic args]) async {
+    final id = playerWindowId;
+    if (id != null) {
+      await DesktopMultiWindow.invokeMethod(id, method, args);
+    }
+  }
+
   void Function(dynamic playing) get _playingCallback => (playing) {
         final id = playerWindowId;
         if (id != null) {
@@ -95,7 +102,7 @@ class KaraokeMainPlayerControllerImpl extends KaraokeMainPlayerController {
   @override
   void play() {
     if (!isLoaded) return;
-    _audioPlayer.play();
+    _audioPlayer.play().then((_) => _invokeMethod('playing', _audioPlayer.playing));
   }
 
   @override
@@ -106,13 +113,13 @@ class KaraokeMainPlayerControllerImpl extends KaraokeMainPlayerController {
 
   @override
   void stop() {
-    _audioPlayer.stop();
+    _audioPlayer.stop().then((_) => _invokeMethod('playing', _audioPlayer.playing));
   }
 
   @override
   void pause() {
     if (!isLoaded) return;
-    _audioPlayer.pause();
+    _audioPlayer.pause().then((_) => _invokeMethod('playing', _audioPlayer.playing));
   }
 
   @override
@@ -125,7 +132,21 @@ class KaraokeMainPlayerControllerImpl extends KaraokeMainPlayerController {
   }
 
   @override
-  final Queue<SongQueueItem> queue = Queue();
+  void restart() {
+    if (!isLoaded) return;
+    _audioPlayer
+        .seek(const Duration(milliseconds: 0))
+        .then((_) => _audioPlayer.play())
+        .then((_) => _invokeMethod('playing', _audioPlayer.playing));
+  }
+
+  @override
+  void skip() {
+    // TODO: implement skip when queue ready
+    if (!isLoaded) return;
+    _audioPlayer.seek(const Duration(milliseconds: 0));
+    _audioPlayer.play().then((_) => _invokeMethod('playing', _audioPlayer.playing));
+  }
 }
 
 // Feed your own stream of bytes into the player

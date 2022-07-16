@@ -29,8 +29,9 @@ class KaraokeVideoPlayerControllerImpl extends KaraokeVideoPlayerController {
         switch (call.method) {
           case 'render':
             return renderStream.sink.add(_decodeRender(call.arguments));
-          case 'play':
-            return isPlayingStream.sink.add(call.arguments as bool);
+          case 'playing':
+            final playing = call.arguments as bool;
+            return isPlayingStream.sink.add(playing);
           default:
             return Future.value('Method not implemented');
         }
@@ -52,4 +53,7 @@ class KaraokeVideoPlayerControllerImpl extends KaraokeVideoPlayerController {
 
   @override
   Future<void> skip() async => await _invokeMethod('skip');
+
+  @override
+  Future<void> restart() async => await _invokeMethod('restart');
 }

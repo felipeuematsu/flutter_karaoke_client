@@ -25,7 +25,7 @@ class _KaraokeMiniPlayerViewState extends State<KaraokeMiniPlayerView> {
     return Container(
       height: CDGContext.kHeightDouble,
       width: CDGContext.kWidthDouble,
-      color: const Color(0xFFEEEEEE),
+      color: const Color(0xFFBBBBBB),
       child: StreamBuilder<CdgRender>(
         stream: widget.karaokeService.renderStream.stream,
         builder: (_, snapshot) {
