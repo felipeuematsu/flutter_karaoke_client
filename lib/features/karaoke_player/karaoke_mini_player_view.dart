@@ -30,7 +30,9 @@ class _KaraokeMiniPlayerViewState extends State<KaraokeMiniPlayerView> {
         stream: widget.karaokeService.renderStream.stream,
         builder: (_, snapshot) {
           final data = snapshot.data;
-          if (data == null) return const ProgressRing();
+          if (data == null) {
+            return const Center(child: ProgressRing());
+          }
           return FutureBuilder<Image>(
             future: Bitmap.fromHeadful(data.imageData.width, data.imageData.height, data.imageData.data).buildImage(),
             builder: (context, snapshot) {

@@ -1,9 +1,12 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_cdg_karaoke_player/config/routes.dart';
 import 'package:flutter_cdg_karaoke_player/config/theme.dart';
 import 'package:flutter_cdg_karaoke_player/features/home/home_view.dart';
 import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/karaoke_player_window_app.dart';
+import 'package:flutter_cdg_karaoke_player/features/queue/queue_view.dart';
+import 'package:flutter_cdg_karaoke_player/features/songs/songs_view.dart';
 import 'package:flutter_cdg_karaoke_player/service/karaoke_main_player_controller.dart';
 import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/karaoke_player_window.dart';
 import 'package:flutter_cdg_karaoke_player/service/impl/karaoke_main_player_controller_impl.dart';
@@ -47,7 +50,12 @@ class MainApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       theme: lightTheme,
-      home: const HomeView(),
+      routes: {
+        Routes.home.route: (context) => const HomeView(),
+        Routes.songs.route: (context) => const SongsView(),
+        Routes.queue.route: (context) => const QueueView(),
+      },
+      initialRoute: Routes.home.route,
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 final lightTheme = ThemeData().copyWith(
+  animationCurve: Curves.easeInOut,
   activeColor: const Color(0xFF399F2E),
   accentColor: AccentColor('normal', const {
     'lightest': Color(0xffd9f6d5),
