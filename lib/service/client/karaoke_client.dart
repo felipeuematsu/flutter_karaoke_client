@@ -6,7 +6,7 @@ class KaraokeClient extends AbstractClient {
   @override
   BaseOptions getBaseOptions() {
     return BaseOptions(
-      baseUrl: 'https://karaoke.eu-cidadao.pt/api/',
+      baseUrl: 'https://localhost:8088',
       connectTimeout: 5000,
       receiveTimeout: 5000,
       headers: {

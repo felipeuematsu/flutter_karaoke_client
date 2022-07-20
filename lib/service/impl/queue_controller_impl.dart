@@ -14,25 +14,24 @@ class QueueControllerImpl implements QueueController {
 
   @override
   void add(SongQueueItem item) {
-    // TODO: implement add
+    queueService.add(item).then((queue) => _queueStream.add(queue));
   }
 
   @override
   void clear() {
-    // TODO: implement clear
+    queueService.clear().then((queue) => _queueStream.add(queue));
   }
 
   @override
   void remove(SongQueueItem item) {
-    // TODO: implement remove
+    queueService.remove(item).then((queue) => _queueStream.add(queue));
   }
 
   @override
   void skip() {
-    // TODO: implement skip
+    queueService.skip().then((queue) => _queueStream.add(queue));
   }
 
   @override
-  // TODO: implement queueStream
   Stream<Queue<SongQueueItem>> get queueStream => _queueStream.stream;
 }
