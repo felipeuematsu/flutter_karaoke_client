@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_cdg_karaoke_player/service/client/abstract_client.dart';
 
 class KaraokeClient extends AbstractClient {
-
   @override
   BaseOptions getBaseOptions() {
     return BaseOptions(
@@ -14,7 +13,5 @@ class KaraokeClient extends AbstractClient {
         'Accept': 'application/json',
       },
     );
-
   }
-
 }

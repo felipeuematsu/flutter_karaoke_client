@@ -11,9 +11,10 @@ class QueueServiceImpl extends QueueService {
 
   @override
   Future<Queue<SongQueueItem>> getQueue() async {
-    final response = await client.get('/queue');
-    final queue = response.data as List<dynamic>;
-    return Queue.from(queue.map((item) => SongQueueItem.fromMap(item)));
+    // final response = await client.get('/queue');
+    // final queue = response.data as List<dynamic>;
+    // return Queue.from(queue.map((item) => SongQueueItem.fromMap(item)));
+    return Future.value(Queue<SongQueueItem>.of([]));
   }
 
   @override

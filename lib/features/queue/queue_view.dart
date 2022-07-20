@@ -9,6 +9,9 @@ class QueueView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CustomNavigationView(selected: 2);
+    return CustomNavigationView(
+      selected: 2,
+      child: Container(),
+    );
   }
 }

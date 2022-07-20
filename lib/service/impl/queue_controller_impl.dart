@@ -6,7 +6,13 @@ import 'package:flutter_cdg_karaoke_player/service/queue_controller.dart';
 import 'package:flutter_cdg_karaoke_player/service/queue_service.dart';
 
 class QueueControllerImpl implements QueueController {
-  QueueControllerImpl(this.queueService);
+  QueueControllerImpl(this.queueService) {
+    _timer;
+  }
+
+  late final _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    queueService.getQueue().then((queue) => _queueStream.sink.add(queue));
+  });
 
   final _queueStream = StreamController<Queue<SongQueueItem>>.broadcast();
 

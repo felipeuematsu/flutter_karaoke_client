@@ -7,11 +7,15 @@ import 'package:flutter_cdg_karaoke_player/features/home/home_view.dart';
 import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/karaoke_player_window_app.dart';
 import 'package:flutter_cdg_karaoke_player/features/queue/queue_view.dart';
 import 'package:flutter_cdg_karaoke_player/features/songs/songs_view.dart';
-import 'package:flutter_cdg_karaoke_player/service/karaoke_main_player_controller.dart';
-import 'package:flutter_cdg_karaoke_player/features/karaoke_player_window/karaoke_player_window.dart';
+import 'package:flutter_cdg_karaoke_player/service/client/karaoke_client.dart';
 import 'package:flutter_cdg_karaoke_player/service/impl/karaoke_main_player_controller_impl.dart';
-import 'package:flutter_cdg_karaoke_player/service/karaoke_video_player_controller.dart';
 import 'package:flutter_cdg_karaoke_player/service/impl/karaoke_video_player_controller_impl.dart';
+import 'package:flutter_cdg_karaoke_player/service/impl/queue_controller_impl.dart';
+import 'package:flutter_cdg_karaoke_player/service/impl/queue_service_impl.dart';
+import 'package:flutter_cdg_karaoke_player/service/karaoke_main_player_controller.dart';
+import 'package:flutter_cdg_karaoke_player/service/karaoke_video_player_controller.dart';
+import 'package:flutter_cdg_karaoke_player/service/queue_controller.dart';
+import 'package:flutter_cdg_karaoke_player/service/queue_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:list_ext/list_ext.dart';
 
@@ -19,6 +23,9 @@ void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   if (args.firstOrNull == 'multi_window') {
     GetIt.I.registerSingleton<KaraokeVideoPlayerController>(KaraokeVideoPlayerControllerImpl());
+    GetIt.I.registerSingleton<KaraokeClient>(KaraokeClient());
+    GetIt.I.registerSingleton<QueueService>(QueueServiceImpl(GetIt.I.get()));
+    GetIt.I.registerSingleton<QueueController>(QueueControllerImpl(GetIt.I.get()));
     runApp(const MainApp());
   } else {
     final window = await DesktopMultiWindow.createWindow('');
@@ -53,7 +60,7 @@ class MainApp extends StatelessWidget {
       routes: {
         Routes.home.route: (context) => const HomeView(),
         Routes.songs.route: (context) => const SongsView(),
-        Routes.queue.route: (context) => const QueueView(),
+        Routes.queue.route: (context) => QueueView(queueController: GetIt.I.get<QueueController>()),
       },
       initialRoute: Routes.home.route,
     );

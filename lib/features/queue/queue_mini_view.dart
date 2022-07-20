@@ -11,28 +11,44 @@ class QueueMiniView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Acrylic(
-      child: StreamBuilder<Queue<SongQueueItem>>(
-        stream: queueController.queueStream,
-        builder: (context, snapshot) {
-          final queue = snapshot.data;
-          if (queue == null) {
-            return const Center(child: ProgressRing());
-          }
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Acrylic(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: StreamBuilder<Queue<SongQueueItem>>(
+            stream: queueController.queueStream,
+            builder: (context, snapshot) {
+              final queue = snapshot.data;
+              if (queue == null) {
+                return const Center(child: ProgressRing());
+              }
 
-          if (queue.isEmpty) {
-            return ListView(children: const [ListTile(title: Text('No songs in queue'), leading: Icon(FluentIcons.field_empty))]);
-          }
+              if (queue.isEmpty) {
+                return ListView(
+                  padding: const EdgeInsets.all(8.0),
+                  children: [
+                    Acrylic(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                      tint: FluentTheme.of(context).disabledColor,
+                      child: const ListTile(title: Text('No songs in queue'), leading: Icon(FluentIcons.field_empty)),
+                    )
+                  ],
+                );
+              }
 
-          return ListView.builder(
-            itemCount: queue.length,
-            itemBuilder: (context, index) => ListTile(
-                title: Text(queue.elementAt(index).song.title),
-                leading: Text(index.toString()),
-                subtitle: Text(queue.elementAt(index).singer.name),
-              ),
-          );
-        },
+              return ListView.builder(
+                itemCount: queue.length,
+                itemBuilder: (context, index) => ListTile(
+                  title: Text(queue.elementAt(index).song.title),
+                  leading: Text(index.toString()),
+                  subtitle: Text(queue.elementAt(index).singer.name),
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
